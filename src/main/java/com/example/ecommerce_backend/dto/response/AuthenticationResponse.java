@@ -6,10 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO for authentication response
- * Contains JWT tokens and user information
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,9 +14,6 @@ public class AuthenticationResponse {
     
     @JsonProperty("access_token")
     private String accessToken;
-    
-    @JsonProperty("refresh_token")
-    private String refreshToken;
     
     @Builder.Default
     @JsonProperty("token_type")

@@ -69,7 +69,6 @@ Content-Type: application/json
   "message": "Login successful",
   "data": {
     "access_token": "eyJhbGciOiJIUzI1NiJ9...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiJ9...",
     "token_type": "Bearer",
     "expires_in": 86400000,
     "user": {
