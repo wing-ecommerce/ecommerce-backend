@@ -1,0 +1,15 @@
+package com.example.ecommerce_backend.repository;
+
+
+
+import com.example.ecommerce_backend.entity.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface CategoryRepository extends JpaRepository<Category, String> {
+
+    Optional<Category> findBySlug(String slug);
+    boolean existsBySlug(String slug);
+}
+
