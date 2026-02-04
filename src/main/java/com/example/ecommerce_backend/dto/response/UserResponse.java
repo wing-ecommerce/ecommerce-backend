@@ -1,6 +1,7 @@
 package com.example.ecommerce_backend.dto.response;
 
 import com.example.ecommerce_backend.entity.Role;
+import com.example.ecommerce_backend.entity.OAuthProvider;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,12 @@ public class UserResponse {
     private Role role;
     
     private Boolean enabled;
+
+    private String profileImageUrl;
+
+    private OAuthProvider oauthProvider;
+    
+    private Boolean emailVerified;
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

@@ -1,6 +1,7 @@
 package com.example.ecommerce_backend.controller;
 
 import com.example.ecommerce_backend.dto.request.LoginRequest;
+import com.example.ecommerce_backend.dto.request.OAuthLoginRequest;
 import com.example.ecommerce_backend.dto.request.RegisterRequest;
 import com.example.ecommerce_backend.dto.response.ApiResponse;
 import com.example.ecommerce_backend.dto.response.AuthenticationResponse;
@@ -22,6 +23,9 @@ public class AuthenticationController {
     
     private final AuthenticationService authenticationService;
     
+    /**
+     * Register a new user with username and password
+     */
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> register(
             @Valid @RequestBody RegisterRequest request,
@@ -38,6 +42,9 @@ public class AuthenticationController {
                 .body(ApiResponse.success(response, "User registered successfully"));
     }
     
+    /**
+     * Login with username/email and password
+     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> login(
             @Valid @RequestBody LoginRequest request,
@@ -53,6 +60,29 @@ public class AuthenticationController {
         return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
     }
     
+    /**
+     * OAuth login - handles Google, Facebook, GitHub, etc.
+     * Creates new user if doesn't exist, logs in if exists
+     */
+    @PostMapping("/oauth/login")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> oauthLogin(
+            @Valid @RequestBody OAuthLoginRequest request,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse
+    ) {
+        AuthenticationResponse response = authenticationService.oauthLogin(
+                request, 
+                httpRequest, 
+                httpResponse
+        );
+        
+        return ResponseEntity.ok(ApiResponse.success(response, "OAuth login successful"));
+    }
+    
+    /**
+     * Refresh access token using refresh token from HTTP-only cookie
+     * Rotates refresh token for security
+     */
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(
             HttpServletRequest httpRequest,
@@ -66,6 +96,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(ApiResponse.success(response, "Token refreshed successfully"));
     }
     
+    /**
+     * Logout from current device
+     * Revokes refresh token and clears cookie
+     */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             HttpServletRequest httpRequest,
@@ -76,6 +110,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(ApiResponse.success(null, "Logout successful"));
     }
     
+    /**
+     * Logout from all devices
+     * Revokes all refresh tokens for the current user
+     */
     @PostMapping("/logout-all")
     public ResponseEntity<ApiResponse<Void>> logoutAllDevices(
             @AuthenticationPrincipal User user,

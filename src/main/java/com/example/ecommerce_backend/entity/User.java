@@ -13,10 +13,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * User entity representing a user in the system
- * Implements UserDetails for Spring Security integration
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,7 +20,8 @@ import java.util.List;
 @Entity
 @Table(name = "users", indexes = {
     @Index(name = "idx_email", columnList = "email"),
-    @Index(name = "idx_username", columnList = "username")
+    @Index(name = "idx_username", columnList = "username"),
+    @Index(name = "idx_oauth_provider_id", columnList = "oauthProvider,oauthProviderId")
 })
 public class User implements UserDetails {
     
@@ -38,7 +35,8 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
     
-    @Column(nullable = false)
+    // Password can be null for OAuth users
+    @Column
     private String password;
     
     @Column(name = "first_name", length = 50)
@@ -53,6 +51,21 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+    
+    // OAuth fields
+    @Enumerated(EnumType.STRING)
+    @Column(name = "oauth_provider", length = 20)
+    private OAuthProvider oauthProvider;
+    
+    @Column(name = "oauth_provider_id", length = 100)
+    private String oauthProviderId;
+    
+    @Column(name = "profile_image_url", length = 500)
+    private String profileImageUrl;
+    
+    @Column(name = "email_verified")
+    @Builder.Default
+    private Boolean emailVerified = false;
     
     @Builder.Default
     @Column(nullable = false)
@@ -90,7 +103,6 @@ public class User implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
     
-    // UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
@@ -124,5 +136,28 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+    
+    /**
+     * Checks if this user authenticated via OAuth (Google, Facebook, etc.)
+     * @return true if user is an OAuth user, false if local password user
+     */
+    public boolean isOAuthUser() {
+        return oauthProvider != null && oauthProvider != OAuthProvider.LOCAL;
+    }
+    
+    /**
+     * Gets the full name of the user
+     * @return firstName + lastName, or username if names not available
+     */
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
+        }
+        return username;
     }
 }

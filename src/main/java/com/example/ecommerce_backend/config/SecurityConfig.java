@@ -40,14 +40,24 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints - no authentication required
                         .requestMatchers(
-                                "/api/v1/auth/**",
+                                "/api/v1/auth/register",
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/refresh",
+                                "/api/v1/auth/oauth/**",  // Allow all OAuth endpoints
                                 "/api/v1/public/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/actuator/health",
+                                "/error"
                         ).permitAll()
+                        
+                        // Admin endpoints - require ADMIN role
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        
+                        // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -62,15 +72,52 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:4000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+        
+        // ⚠️ Hardcoded origins - update these for your frontend URLs
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:4000"
+        ));
+        
+        // Allowed HTTP methods
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", 
+                "POST", 
+                "PUT", 
+                "PATCH", 
+                "DELETE", 
+                "OPTIONS"
+        ));
+        
+        // Allowed request headers
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+        
+        // Exposed response headers (headers that frontend can access)
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Total-Count"
+        ));
+        
+        // Allow credentials (cookies, authorization headers)
+        // Required for HTTP-only cookies and Authorization header
         configuration.setAllowCredentials(true);
+        
+        // How long the browser should cache preflight requests (in seconds)
         configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        
         return source;
     }
     

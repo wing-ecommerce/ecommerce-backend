@@ -1,6 +1,7 @@
 package com.example.ecommerce_backend.repository;
 
 import com.example.ecommerce_backend.entity.User;
+import com.example.ecommerce_backend.entity.OAuthProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     
     Optional<User> findByUsernameOrEmail(String username, String email);
+
+    Optional<User> findByOauthProviderAndOauthProviderId(OAuthProvider provider, String providerId);
+
+    Optional<User> findByEmailAndOauthProvider(String email, OAuthProvider provider);
+       
+    Boolean existsByOauthProviderAndOauthProviderId(OAuthProvider provider, String providerId);
     
     Boolean existsByUsername(String username);
     
