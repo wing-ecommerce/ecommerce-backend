@@ -4,6 +4,7 @@ import com.example.ecommerce_backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -53,8 +54,18 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/error"
                         ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/categories/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/products/**"
+                        ).permitAll()
                         
                         // Admin endpoints - require ADMIN role
+                        .requestMatchers("/api/v1/categories/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         
                         // All other endpoints require authentication
