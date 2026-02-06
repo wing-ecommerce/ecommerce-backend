@@ -21,7 +21,7 @@ public class ProductResponse {
     private String image;
     private List<String> additionalPhotos;
     private String description;
-    private Boolean inStock;
+    private Integer stock;
     private List<String> sizes;
     private String categoryId;
     private String categoryName;
@@ -37,7 +37,7 @@ public class ProductResponse {
                 .image(product.getImage())
                 .additionalPhotos(product.getAdditionalPhotos())
                 .description(product.getDescription())
-                .inStock(product.getInStock())
+                .stock(product.getStock())
                 .sizes(product.getSizes())
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)

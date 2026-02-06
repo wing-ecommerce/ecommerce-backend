@@ -1,8 +1,6 @@
 package com.example.ecommerce_backend.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.List;
@@ -18,6 +16,10 @@ public class ProductRequest {
     private String name;
 
     @NotBlank(message = "Slug is required")
+    @Pattern(
+            regexp = "^[a-z]+$",
+            message = "Value must contain lowercase letters only"
+    )
     private String slug;
 
     @NotNull(message = "Price is required")
@@ -29,9 +31,9 @@ public class ProductRequest {
     private String image;
     private List<String> additionalPhotos;
     private String description;
-    private Boolean inStock = true;
+    @Min(value = 1, message = "Stock must be at least 1")
+    private Integer stock;
     private List<String> sizes;
-
     @NotBlank(message = "Category ID is required")
     private String categoryId;
 }

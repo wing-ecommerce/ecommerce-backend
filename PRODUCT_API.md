@@ -181,7 +181,7 @@ Content-Type: application/json
   "image": "iphone_main.jpg",
   "additionalPhotos": ["photo1.jpg", "photo2.jpg"],
   "description": "Latest Apple iPhone 15",
-  "inStock": true,
+  "inStock": 10,
   "sizes": ["128GB", "256GB"],
   "categoryId": "c123-uuid"
 }
@@ -213,7 +213,7 @@ Authorization: Bearer <ADMIN_TOKEN>
   "image": "iphone_pro.jpg",
   "additionalPhotos": ["photo1.jpg", "photo2.jpg"],
   "description": "Apple iPhone 15 Pro",
-  "inStock": true,
+  "inStock": 10,
   "sizes": ["256GB", "512GB"],
   "categoryId": "c123-uuid"
 }
