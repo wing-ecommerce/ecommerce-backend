@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
                 .image(request.getImage())
                 .additionalPhotos(request.getAdditionalPhotos())
                 .description(request.getDescription())
-                .inStock(request.getInStock())
+                .stock(request.getStock())
                 .sizes(request.getSizes())
                 .category(category)
                 .build();
@@ -68,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
         product.setImage(request.getImage());
         product.setAdditionalPhotos(request.getAdditionalPhotos());
         product.setDescription(request.getDescription());
-        product.setInStock(request.getInStock());
+        product.setStock(request.getStock());
         product.setSizes(request.getSizes());
         product.setCategory(category);
 

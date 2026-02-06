@@ -1,6 +1,7 @@
 package com.example.ecommerce_backend.entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.*;
@@ -53,7 +54,7 @@ public class Product {
     private String description;
 
     @Column(nullable = false)
-    private Boolean inStock = true;
+    private Integer stock;
 
     /* sizes String[] */
     @ElementCollection
