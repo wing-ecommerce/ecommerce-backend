@@ -24,7 +24,9 @@ public class UpdateUserRequest {
     @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
     
-    @Pattern(regexp = "^[+]?[(]?[0-9]{1,4}[)]?[-\\s\\.]?[(]?[0-9]{1,4}[)]?[-\\s\\.]?[0-9]{1,9}$", 
-             message = "Phone number is not valid")
+    @Pattern(
+        regexp = "^[+0]?[0-9]{9,20}$", 
+        message = "Phone number should start with + or 0, followed by 9-20 digits"
+    )
     private String phoneNumber;
 }
