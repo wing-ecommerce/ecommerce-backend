@@ -17,8 +17,8 @@ public class ProductRequest {
 
     @NotBlank(message = "Slug is required")
     @Pattern(
-            regexp = "^[a-z]+$",
-            message = "Value must contain lowercase letters only"
+    regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+    message = "Slug must be lowercase and may contain hyphens"
     )
     private String slug;
 
