@@ -1,5 +1,6 @@
 package com.example.ecommerce_backend.dto.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -17,8 +18,8 @@ public class ProductRequest {
 
     @NotBlank(message = "Slug is required")
     @Pattern(
-    regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-    message = "Slug must be lowercase and may contain hyphens"
+        regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        message = "Slug must be lowercase and may contain hyphens"
     )
     private String slug;
 
@@ -27,13 +28,40 @@ public class ProductRequest {
     private Double price;
 
     private Double originalPrice;
+
     private Integer discount;
+
     private String image;
+
     private List<String> additionalPhotos;
+
     private String description;
-    @Min(value = 1, message = "Stock must be at least 1")
-    private Integer stock;
-    private List<String> sizes;
+
     @NotBlank(message = "Category ID is required")
     private String categoryId;
+
+    // Size variants with individual stock
+    @NotNull(message = "At least one size variant is required")
+    @Size(min = 1, message = "At least one size variant is required")
+    @Valid
+    private List<SizeRequest> sizes;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SizeRequest {
+
+        @NotBlank(message = "Size is required")
+        private String size;
+
+        @NotNull(message = "Stock is required")
+        @Min(value = 0, message = "Stock cannot be negative")
+        private Integer stock;
+
+        private Double priceOverride; // Optional
+
+        private String sku; // Optional
+    }
 }

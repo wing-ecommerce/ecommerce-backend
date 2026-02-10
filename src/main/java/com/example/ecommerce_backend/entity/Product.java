@@ -1,13 +1,9 @@
 package com.example.ecommerce_backend.entity;
-import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.*;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.*;
 
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +20,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Prisma autoincrement → IDENTITY
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -41,7 +37,7 @@ public class Product {
 
     private String image;
 
-    /* String[] in Prisma → @ElementCollection */
+    /* Additional photos */
     @ElementCollection
     @CollectionTable(
             name = "product_additional_photos",
@@ -53,27 +49,46 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private Integer stock;
-
-    /* sizes String[] */
-    @ElementCollection
-    @CollectionTable(
-            name = "product_sizes",
-            joinColumns = @JoinColumn(name = "product_id")
-    )
-    @Column(name = "size")
-    private List<String> sizes = new ArrayList<>();
-
-    /* Relation */
+    /* Category */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    /* Variants (sizes with individual stock) */
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+    private List<ProductSize> sizes = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-}
 
+    // Helper methods for managing sizes
+    public void addSize(ProductSize size) {
+        sizes.add(size);
+        size.setProduct(this);
+    }
+
+    public void removeSize(ProductSize size) {
+        sizes.remove(size);
+        size.setProduct(null);
+    }
+
+    public void clearSizes() {
+        sizes.forEach(size -> size.setProduct(null));
+        sizes.clear();
+    }
+
+    // Calculate total stock across all sizes
+    public Integer getTotalStock() {
+        return sizes.stream()
+                .mapToInt(ProductSize::getStock)
+                .sum();
+    }
+}
