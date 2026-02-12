@@ -1,5 +1,6 @@
 package com.example.ecommerce_backend.controller;
 
+import com.example.ecommerce_backend.dto.request.ProductPatchRequest;
 import com.example.ecommerce_backend.dto.request.ProductRequest;
 import com.example.ecommerce_backend.dto.response.ApiResponse;
 import com.example.ecommerce_backend.dto.response.ProductResponse;
@@ -8,7 +9,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -22,11 +25,18 @@ public class ProductController {
         return ApiResponse.success(productService.create(request));
     }
 
-    // UPDATE PRODUCT (ADMIN only)
+    // UPDATE PRODUCT - Full replacement (ADMIN only)
     @PutMapping("/{id}")
     public ApiResponse<ProductResponse> update(@PathVariable Long id,
                                                @Valid @RequestBody ProductRequest request) {
         return ApiResponse.success(productService.update(id, request));
+    }
+
+    // PATCH PRODUCT - Partial update (ADMIN only) ✨ NEW
+    @PatchMapping("/{id}")
+    public ApiResponse<ProductResponse> patch(@PathVariable Long id,
+                                              @Valid @RequestBody ProductPatchRequest request) {
+        return ApiResponse.success(productService.patch(id, request));
     }
 
     // DELETE PRODUCT (ADMIN only)
@@ -54,6 +64,8 @@ public class ProductController {
             return ApiResponse.success(list);
         }
     }
+
+    // GET PRODUCTS BY CATEGORY (Paginated)
     @GetMapping("/category/{categoryId}")
     public ApiResponse<Page<ProductResponse>> getProductsByCategory(
             @PathVariable String categoryId,
