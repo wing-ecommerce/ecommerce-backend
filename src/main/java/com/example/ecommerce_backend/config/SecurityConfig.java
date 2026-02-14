@@ -2,6 +2,7 @@ package com.example.ecommerce_backend.config;
 
 import com.example.ecommerce_backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,6 +35,9 @@ public class SecurityConfig {
     
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    
+    @Value("${application.security.cors.allowed-origins}")
+    private String allowedOrigins;
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -84,12 +88,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // ⚠️ Hardcoded origins - update these for your frontend URLs
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "http://localhost:4000"
-        ));
+        // Load allowed origins from environment variable
+        List<String> origins = Arrays.asList(allowedOrigins.split(","));
+        configuration.setAllowedOrigins(origins);
         
         // Allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList(
