@@ -1,163 +1,121 @@
-# Ecommerce_Backend
+# Teespace E-commerce Backend API
 
-### Secure REST API with Spring Boot
-## Features
+📖 **Project Description**
+• RESTful API for an e-commerce system
+• Handles authentication, products, orders, users, and roles
+• Built with Spring Boot, Spring Security (JWT), and PostgreSQL
 
-### Core Features
-- **User Authentication & Authorization**
-  - JWT-based authentication
-  - Role-based access control (USER, ADMIN, MODERATOR)
-  - Secure password encoding with BCrypt
-  
-- **RESTful API Design**
-  - Clean REST endpoints
-  - Proper HTTP status codes
-  - Standardized response format
-  
--  **DTO Pattern**
-  - Request DTOs with comprehensive validation
-  - Response DTOs for data transfer
-  - Clear separation of concerns
+---
 
--  **Input Validation**
-  - Bean Validation (JSR 380)
-  - Custom validators
-  - Password strength requirements
-  - Email format validation
+🛠 **Tech Stack**
+• Java 17
+• Spring Boot
+• Spring Security (JWT Authentication)
+• PostgreSQL
+• JPA / Hibernate
+• Maven
 
--  **Spring Data JPA**
-  - Entity-relationship mapping
-  - Custom query methods
-  - Pagination support
-  - Automatic timestamps
+---
 
--  **Global Exception Handling**
-  - Centralized error handling
-  - Consistent error responses
-  - Custom exception types
-  - Validation error formatting
+📂 **Project Structure**
 
-### Advanced Features
-
--  **Rate Limiting**
-  - IP-based rate limiting using Bucket4j
-  - Configurable request limits
-  - Automatic token refill
-  - Rate limit headers in response
-
--  **Full-Text Search**
-  - Search users by username, email, name
-  - Case-insensitive search
-  - Pagination support
-  - PostgreSQL full-text search support
-  
-## Validation Rules
-
-### Registration
-- **Username:** 3-50 characters, alphanumeric with underscore and hyphen
-- **Email:** Valid email format
-- **Password:** 
-  - 8-100 characters
-  - At least one digit
-  - At least one lowercase letter
-  - At least one uppercase letter
-  - At least one special character (@#$%^&+=!)
-- **Phone:** Valid international phone format
-
-### Update
-- All fields are optional
-- Same validation rules apply when provided
-
-## Security Features
-
-### JWT Authentication
-- Access token expires in 24 hours
-- Refresh token expires in 7 days
-- Tokens are signed with HS256
-- Secret key configured in application.yml
-
-### Password Security
-- BCrypt hashing with strength 10
-- Password strength requirements enforced
-- Current password verification for changes
-
-### Role-Based Access Control
-- **USER:** Basic user operations
-- **MODERATOR:** Extended permissions
-- **ADMIN:** Full system access
-
-### Rate Limiting
-- Default: 100 requests per 60 seconds
-- Token bucket algorithm
-- Per-IP tracking
-- Configurable limits
-
-## Response Format
-
-### Success Response
-```json
-{
-  "success": true,
-  "message": "Operation successful",
-  "data": { ... },
-  "timestamp": "2026-01-27 10:30:00"
-}
+```
+src/main/java/com/example/ecommerce_backend/
+ ├── controller       # REST controllers (Auth, Users, Products, Orders)
+ ├── service          # Business logic and service layer
+ ├── repository       # JPA repositories for DB access
+ ├── entity           # Database entities (User, Product, Order, Role)
+ ├── dto              # Data Transfer Objects for requests/responses
+ ├── config           # Security and JWT configuration
+ ├── exception        # Custom exceptions and handlers
+ └── util             # Utility classes (JWT utils, validation, etc.)
 ```
 
-### Error Response
-```json
-{
-  "success": false,
-  "message": "Error description",
-  "timestamp": "2026-01-27 10:30:00",
-  "path": "/api/v1/users/999"
-}
+---
+
+🔗 **Database Table Relationships**
+
+| Entity    | Relationship                            | Related Entity |
+| --------- | --------------------------------------- | -------------- |
+| User      | One-to-Many                             | Order          |
+| User      | Many-to-Many                            | Role           |
+| Product   | Many-to-Many (via OrderItem)            | Order          |
+| Order     | Many-to-One                             | User           |
+| Order     | One-to-Many (Order contains OrderItems) | OrderItem      |
+| OrderItem | Many-to-One                             | Product        |
+
+> Users can have multiple Orders, Orders contain multiple Products via OrderItem junction table, and Users can have multiple Roles.
+
+---
+
+🔐 **Authentication**
+• JWT-based authentication
+• Access Token with short expiry
+• Refresh Token stored in HttpOnly cookie for session renewal
+• Roles-based access (USER / ADMIN)
+
+---
+
+⚙️ **Environment Variables**
+
+`application.properties` example:
+
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/teespace
+spring.datasource.username=your_db_username
+spring.datasource.password=your_db_password
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+jwt.secret=your_jwt_secret
+jwt.expiration=86400000
+jwt.refreshExpiration=604800000
 ```
 
-### Validation Error Response
-```json
-{
-  "success": false,
-  "message": "Validation failed",
-  "data": {
-    "username": "Username must be between 3 and 50 characters",
-    "email": "Email should be valid"
-  },
-  "timestamp": "2026-01-27 10:30:00",
-  "path": "/api/v1/auth/register"
-}
-```
+---
 
-### Test with Postman/cURL
+🚀 **How to Run Backend**
 
-**Register:**
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "testuser",
-    "email": "test@example.com",
-    "password": "Test123!@#",
-    "confirmPassword": "Test123!@#",
-    "firstName": "Test",
-    "lastName": "User"
-  }'
+git clone https://github.com/wing-ecommerce/ecommerce-backend.git
+cd ecommerce-backend
+mvn clean install
+mvn spring-boot:run
 ```
 
-**Login:**
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "usernameOrEmail": "testuser",
-    "password": "Test123!@#"
-  }'
-```
+Runs at:
+`http://localhost:8080`
 
-**Get Current User:**
-```bash
-curl -X GET http://localhost:8080/api/v1/users/me \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
+---
 
+📌 **API Endpoints (Important!)**
 
+**Auth**
+• POST `/api/auth/register` – Register new user
+• POST `/api/auth/login` – Login and get JWT
+• POST `/api/auth/refresh` – Refresh access token
+
+**Users**
+• GET `/api/users` – Get all users (Admin)
+• GET `/api/users/{id}` – Get user by ID
+• PUT `/api/users/{id}` – Update user (Admin/User)
+• DELETE `/api/users/{id}` – Delete user (Admin)
+
+**Products**
+• GET `/api/products` – List all products
+• GET `/api/products/{id}` – Get product by ID
+• POST `/api/products` – Create product (Admin)
+• PUT `/api/products/{id}` – Update product (Admin)
+• DELETE `/api/products/{id}` – Delete product (Admin)
+
+**Orders**
+• GET `/api/orders` – List all orders (Admin) / User-specific orders
+• POST `/api/orders` – Create new order
+• GET `/api/orders/{id}` – Get order by ID
+
+---
+
+👥 **Roles**
+• **USER** – Can browse products, create orders, view own profile/orders
+• **ADMIN** – Full access: manage products, manage users, view all orders
