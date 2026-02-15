@@ -20,7 +20,9 @@
 ---
 
 
-## 📖 Project Description
+##  Project Description
+- git repo:https://github.com/wing-ecommerce/ecommerce-backend.git
+- hosting: https://teespace.onrender.com/
 
 RESTful API for an e-commerce system.
 
@@ -249,7 +251,7 @@ Authorization: Bearer <access_token>
 
 ---
 
-## ⚙ Environment Variables
+##  Environment Variables
 
 ```
 spring.datasource.url=jdbc:postgresql://localhost:5432/teespace
